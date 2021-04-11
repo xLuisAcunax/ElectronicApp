@@ -1,0 +1,6 @@
+<h4>Internal server error - refresh the pager!</h4>
+<ng-container *ngIf="error">
+    <h5 class="text-danger">Error: {{error.message}}</h5>
+    <hr>
+    <code class="mt-5">{{error.details}}</code>
+</ng-container>
