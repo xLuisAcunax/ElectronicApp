@@ -7,6 +7,8 @@ import { Product } from '../_models/product';
 })
 export class ProductsService {
   baseUrl = 'https://localhost:5001/api/';
+
+  model: Array<Product>
   products: Product = { name: 'laptop', description: 'asus tuf gaming', quantity: 5 };
 
   constructor(private http: HttpClient) { }

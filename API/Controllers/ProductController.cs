@@ -1,9 +1,9 @@
-﻿using API.Data;
-using API.DTOs;
+﻿using API.DTOs;
 using API.Entities;
+using API.Interfaces;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -11,27 +11,34 @@ namespace API.Controllers
 {
     public class ProductController : BaseApiController
     {
-        private readonly DataContext _context;
+        private readonly IProductRepository _productRepository;
+        private readonly IMapper _mapper;
 
-        public ProductController(DataContext context)
+        public ProductController(IProductRepository productRepository, IMapper mapper)
         {
-            _context = context;
+            _productRepository = productRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public ActionResult<IEnumerable<ProductDto>> GetProducts()
         {
-            var users = await _context.Product.ToListAsync();
+            var products = _productRepository.GetProducts();
 
-            return users;
+            var productsToReturn = _mapper.Map<IEnumerable<ProductDto>>(products);
+
+            return Ok(productsToReturn);
         }
 
-        [Authorize]
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(int id)
+        [HttpGet("{name}")]
+        public ActionResult<IEnumerable<ProductDto>> GetProducts(string name)
         {
-            return await _context.Product.FindAsync(id);
+            var products = _productRepository.GetProductByName(name);
+
+            var productsToReturn = _mapper.Map<IEnumerable<ProductDto>>(products);
+
+            return Ok(productsToReturn);
         }
 
         [Authorize]
@@ -45,8 +52,8 @@ namespace API.Controllers
                 Quantity = productCreateDto.Quantity
             };
 
-            _context.Product.Add(product);
-            await _context.SaveChangesAsync();
+            _productRepository.Create(product);
+            await _productRepository.SaveAllAsync();
 
             return new ProductDto
             {
