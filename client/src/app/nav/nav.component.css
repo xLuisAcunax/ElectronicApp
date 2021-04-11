@@ -1,0 +1,7 @@
+.navbar-full {
+    display: inline-flex;
+}
+
+.dropdown-toggle, .dropdown-item {
+    cursor: pointer;
+}
